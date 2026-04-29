@@ -58,16 +58,13 @@ python server.py
 
 ## Connecting to Claude Code
 
-Register the server using the Claude Code CLI. Replace the paths and credentials with your own:
+The server loads credentials directly from its `.env` file at startup, so you don't need to pass them to the CLI command. Just register the binary and script paths:
 
 ```bash
 claude mcp add lakefs \
   --scope user \
   /path/to/lakefs-mcp/.venv/bin/python \
-  /path/to/lakefs-mcp/server.py \
-  -e LAKEFS_ENDPOINT=http://localhost:8080 \
-  -e LAKEFS_ACCESS_KEY_ID=your-access-key \
-  -e LAKEFS_SECRET_ACCESS_KEY=your-secret-key
+  /path/to/lakefs-mcp/server.py
 ```
 
 `--scope user` makes the server available in all your projects. Use `--scope local` to limit it to the current project.
