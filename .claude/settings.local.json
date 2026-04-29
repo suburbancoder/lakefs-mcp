@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(.venv/bin/python -c \"import server; print\\('imports OK'\\)\")",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}
