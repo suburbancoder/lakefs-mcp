@@ -24,7 +24,7 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that ex
 ## Setup
 
 ```bash
-git clone https://github.com/suburbanscripter/lakefs-mcp.git
+git clone https://github.com/suburbancoder/lakefs-mcp.git
 cd lakefs-mcp
 
 python3 -m venv .venv
