@@ -2,7 +2,10 @@
 
 import os
 import httpx
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
+
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 LAKEFS_ENDPOINT = os.environ.get("LAKEFS_ENDPOINT", "http://localhost:8080")
 LAKEFS_ACCESS_KEY = os.environ.get("LAKEFS_ACCESS_KEY_ID", "")
@@ -135,7 +138,7 @@ def create_branch(repository: str, name: str, source: str) -> str:
             json={"name": name, "source": source},
         )
         resp.raise_for_status()
-        return resp.json()
+        return resp.text or f"Branch '{name}' created from '{source}'."
 
 
 @mcp.tool()
