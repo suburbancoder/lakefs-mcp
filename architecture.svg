@@ -76,7 +76,7 @@
   <!-- Objects -->
   <rect x="224" y="248" width="160" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
   <text class="th-teal" x="304" y="266" text-anchor="middle" dominant-baseline="central">Objects</text>
-  <text class="ts-teal" x="304" y="282" text-anchor="middle" dominant-baseline="central">list, stat, delete</text>
+  <text class="ts-teal" x="304" y="282" text-anchor="middle" dominant-baseline="central">upload, list, stat, delete</text>
 
   <!-- Diff & merge -->
   <rect x="56" y="308" width="152" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>

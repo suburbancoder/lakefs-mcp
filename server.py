@@ -1,5 +1,6 @@
 """lakeFS MCP Server — exposes lakeFS operations as MCP tools."""
 
+import mimetypes
 import os
 import httpx
 from dotenv import load_dotenv
@@ -363,6 +364,86 @@ def delete_object(repository: str, branch: str, path: str) -> str:
         )
         resp.raise_for_status()
         return f"Object '{path}' deleted from branch '{branch}'."
+
+
+@mcp.tool()
+def upload_object(
+    repository: str,
+    branch: str,
+    local_path: str,
+    dest_path: str = "",
+    create_branch_if_missing: bool = False,
+) -> dict:
+    """Upload a local file to a lakeFS branch (staged for commit).
+
+    A branch name is always required. Writing directly to 'main' is not
+    allowed by lakeFS — use a feature branch and merge when ready.
+
+    If the branch does not exist and create_branch_if_missing is False (the
+    default), the tool returns a prompt asking the user to confirm creation.
+    Set create_branch_if_missing=True to create the branch automatically from
+    main without asking.
+
+    Args:
+        repository: Repository name.
+        branch: Branch name to upload to. Must not be 'main'.
+        local_path: Path to the local file. Accepts absolute paths, relative
+                    paths, or just a filename (e.g. 'test.txt',
+                    'data/file.csv', '/Users/me/data/file.parquet').
+        dest_path: Destination path inside the repository. Defaults to the
+                   file's basename.
+        create_branch_if_missing: When True, create the branch from main
+                                  automatically if it does not exist.
+    """
+    if branch == "main":
+        raise ValueError(
+            "Direct uploads to 'main' are not allowed. Please specify a feature branch. "
+            "If it doesn't exist yet, re-run with create_branch_if_missing=True."
+        )
+
+    local_path = os.path.expanduser(local_path)
+    if not os.path.isabs(local_path):
+        local_path = os.path.join(os.getcwd(), local_path)
+
+    if not os.path.isfile(local_path):
+        raise FileNotFoundError(f"No file found at: {local_path}")
+
+    if not dest_path:
+        dest_path = os.path.basename(local_path)
+
+    with _client() as client:
+        # Check whether the branch exists
+        branch_resp = client.get(f"/repositories/{repository}/branches/{branch}")
+        if branch_resp.status_code == 404:
+            if not create_branch_if_missing:
+                return {
+                    "status": "branch_missing",
+                    "message": (
+                        f"Branch '{branch}' does not exist in '{repository}'. "
+                        f"Would you like to create it from 'main' and proceed with the upload?"
+                    ),
+                }
+            # Create from main
+            create_resp = client.post(
+                f"/repositories/{repository}/branches",
+                json={"name": branch, "source": "main"},
+            )
+            create_resp.raise_for_status()
+
+        content_type, _ = mimetypes.guess_type(local_path)
+        content_type = content_type or "application/octet-stream"
+
+        with open(local_path, "rb") as f:
+            data = f.read()
+
+        resp = client.post(
+            f"/repositories/{repository}/branches/{branch}/objects",
+            params={"path": dest_path},
+            content=data,
+            headers={"Content-Type": content_type},
+        )
+        resp.raise_for_status()
+        return {"dest_path": dest_path, "size_bytes": len(data), "content_type": content_type}
 
 
 # ---------------------------------------------------------------------------
