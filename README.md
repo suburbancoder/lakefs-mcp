@@ -2,6 +2,8 @@
 
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that exposes [lakeFS](https://github.com/treeverse/lakeFS) operations as tools for AI assistants like Claude.
 
+![lakefs-mcp architecture](architecture.svg)
+
 ## Tools
 
 | Group | Tools |
