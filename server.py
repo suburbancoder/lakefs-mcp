@@ -349,6 +349,24 @@ def stat_object(repository: str, ref: str, path: str, user_metadata: bool = True
 
 
 @mcp.tool()
+def get_object(repository: str, ref: str, path: str) -> str:
+    """Download and return the content of an object as text.
+
+    Args:
+        repository: Repository name.
+        ref: Branch name, tag, or commit ID.
+        path: Object path within the repository.
+    """
+    with _client() as client:
+        resp = client.get(
+            f"/repositories/{repository}/refs/{ref}/objects",
+            params={"path": path},
+        )
+        resp.raise_for_status()
+        return resp.text
+
+
+@mcp.tool()
 def delete_object(repository: str, branch: str, path: str) -> str:
     """Delete an object from a branch (staged for commit).
 
